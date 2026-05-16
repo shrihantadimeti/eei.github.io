@@ -776,7 +776,7 @@
       </div>
       <div class="ai-divider"></div>
       <div class="ai-output" id="ai-output">
-        <p class="ai-placeholder">Click "Generate Analysis" above to get a plain-English breakdown of this stock — what it does, how it's performing, and whether beginners should pay attention to it.</p>
+        <p class="ai-placeholder">Click "Generate Analysis" above to get a plain-English breakdown of this stock: what it does, how it's performing, and whether beginners should pay attention to it.</p>
         <div class="ai-loading" id="ai-loading">
           <div class="ai-loading-dot"></div>
           <div class="ai-loading-dot"></div>
@@ -987,7 +987,7 @@
           term: "Today's change",
           value: (up ? '+' : '') + s.changePct.toFixed(2) + '%',
           color: up ? 'var(--green)' : 'var(--red)',
-          desc: `The stock ${up ? 'rose' : 'fell'} ${Math.abs(s.changePct).toFixed(2)}% today. A single day's move tells you about short-term sentiment — news, earnings reports, or broader market mood. Don't read too much into one day.`,
+          desc: `The stock ${up ? 'rose' : 'fell'} ${Math.abs(s.changePct).toFixed(2)}% today. A single day's move tells you about short-term change — news, earnings reports, or broader market mood. Don't read too much into one day.`,
           verdict: { cls: up ? 'verdict-good' : 'verdict-caution', text: up ? 'Positive session' : 'Down today' }
         },
         {
