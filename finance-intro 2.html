@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance 101 / EEI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --gray: #888888;
+      --light-gray: #f4f4f4;
+      --mid-gray: #e8e8e8;
+      --navy: #1a2744;
+      --green: #1a6b3a;
+      --green-bg: #eaf4ee;
+      --red: #a0200e;
+      --red-bg: #fbeaea;
+      --gold: #8a6500;
+      --gold-bg: #fdf6e3;
+      --blue: #1a3a8a;
+      --blue-bg: #edf3ff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--mid-gray);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: var(--black);
+      text-decoration: none;
+      z-index: 102;
+    }
+    .nav-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 32px; height: 32px;
+      background: none; border: none;
+      cursor: pointer; padding: 4px;
+      z-index: 102;
+    }
+    .nav-toggle span {
+      display: block; width: 100%; height: 2px;
+      background: var(--black); border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-links {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 100dvh;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 44px;
+      list-style: none;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links a {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      letter-spacing: -1px;
+      color: var(--black);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gray); }
+    .nav-links a.active { color: var(--gray); }
+
+    /* ── PAGE HEADER ── */
+    #page-header {
+      padding: 160px 48px 80px;
+      border-bottom: 1px solid var(--mid-gray);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .page-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: -2px;
+      line-height: 1.0;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+    .page-desc {
+      font-size: 17px;
+      color: var(--gray);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    /* progress pill */
+    .progress-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      padding: 10px 18px;
+      border: 1px solid var(--mid-gray);
+      background: var(--light-gray);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray);
+    }
+    .pill-steps { display: flex; gap: 4px; }
+    .pill-step {
+      width: 20px; height: 4px;
+      border-radius: 2px;
+      background: var(--mid-gray);
+      transition: background 0.4s;
+    }
+    .pill-step.done { background: var(--black); }
+    .pill-step.active { background: var(--black); }
+
+    /* ── MAIN ── */
+    #content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--mid-gray);
+    }
+
+    /* ── CONCEPT CARDS (2-col grid) ── */
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--mid-gray);
+      border: 1px solid var(--mid-gray);
+      margin-bottom: 64px;
+    }
+    .concept-card {
+      background: var(--white);
+      padding: 32px 28px;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .concept-card.visible { opacity: 1; transform: translateY(0); }
+    .concept-card:nth-child(2) { transition-delay: 0.07s; }
+    .concept-card:nth-child(3) { transition-delay: 0.14s; }
+    .concept-card:nth-child(4) { transition-delay: 0.21s; }
+    .card-icon {
+      font-size: 22px;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .card-term {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+      color: var(--black);
+      margin-bottom: 10px;
+    }
+    .card-body {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.7;
+    }
+    .card-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      letter-spacing: 0.5px;
+    }
+    .tag-green { background: var(--green-bg); color: var(--green); }
+    .tag-blue  { background: var(--blue-bg);  color: var(--blue);  }
+    .tag-gold  { background: var(--gold-bg);  color: var(--gold);  }
+    .tag-gray  { background: var(--light-gray); color: var(--gray); }
+
+    /* ── ASSET CLASS TABLE ── */
+    .asset-table-wrap {
+      border: 1px solid var(--mid-gray);
+      margin-bottom: 64px;
+      overflow-x: auto;
+    }
+    .asset-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .asset-table th {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gray);
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--mid-gray);
+      background: var(--light-gray);
+    }
+    .asset-table td {
+      padding: 18px 20px;
+      font-size: 14px;
+      color: var(--black);
+      border-bottom: 1px solid var(--mid-gray);
+      vertical-align: middle;
+    }
+    .asset-table tr:last-child td { border-bottom: none; }
+    .asset-table tr:hover td { background: var(--light-gray); }
+    .asset-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .asset-sub { font-size: 12px; color: var(--gray); }
+    .risk-bar-bg { height: 5px; background: var(--mid-gray); border-radius: 3px; margin-top: 5px; min-width: 80px; }
+    .risk-bar { height: 5px; border-radius: 3px; }
+
+    /* ── COMPOUNDING INTERACTIVE ── */
+    .compound-box {
+      border: 1px solid var(--mid-gray);
+      margin-bottom: 64px;
+    }
+    .compound-header {
+      padding: 28px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .compound-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+    }
+    .compound-subtitle { font-size: 13px; color: var(--gray); margin-top: 3px; }
+    .compound-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--mid-gray);
+      border-top: 1px solid var(--mid-gray);
+      margin-top: 24px;
+    }
+    .ctrl-item {
+      background: var(--white);
+      padding: 20px 24px;
+    }
+    .ctrl-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+    .ctrl-value {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -1px;
+      color: var(--black);
+      margin-bottom: 10px;
+    }
+    .ctrl-item input[type=range] {
+      width: 100%;
+      appearance: none;
+      height: 3px;
+      background: var(--mid-gray);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ctrl-item input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--black);
+      cursor: pointer;
+    }
+    .compound-result {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--mid-gray);
+      border-top: 1px solid var(--mid-gray);
+    }
+    .result-item {
+      background: var(--light-gray);
+      padding: 20px 24px;
+    }
+    .result-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+    .result-value {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: var(--black);
+    }
+    .result-value.highlight { color: var(--green); }
+    .compound-insight {
+      padding: 20px 24px;
+      background: var(--white);
+      border-top: 1px solid var(--mid-gray);
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.7;
+    }
+    .compound-insight strong { color: var(--black); font-weight: 600; }
+
+    /* ── RISK vs RETURN SPECTRUM ── */
+    .spectrum-box {
+      border: 1px solid var(--mid-gray);
+      margin-bottom: 64px;
+      overflow: hidden;
+    }
+    .spectrum-header { padding: 28px 28px 20px; }
+    .spectrum-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .spectrum-sub { font-size: 13px; color: var(--gray); }
+    .spectrum-track {
+      height: 10px;
+      margin: 0 28px 0;
+      border-radius: 5px;
+      background: linear-gradient(to right, #1a6b3a, #8a6500, #a0200e);
+      position: relative;
+    }
+    .spectrum-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 28px 24px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray);
+    }
+    .spectrum-items {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--mid-gray);
+    }
+    .spectrum-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 100px;
+      gap: 20px;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--mid-gray);
+      align-items: center;
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .spectrum-row.visible { opacity: 1; transform: translateX(0); }
+    .spectrum-row:last-child { border-bottom: none; }
+    .srow-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--black);
+    }
+    .srow-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+    .srow-badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* ── PRINCIPLES LIST ── */
+    .principles-list {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--mid-gray);
+      margin-bottom: 64px;
+    }
+    .principle-row {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 24px;
+      padding: 28px;
+      border-bottom: 1px solid var(--mid-gray);
+      align-items: start;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .principle-row:last-child { border-bottom: none; }
+    .principle-row.visible { opacity: 1; transform: translateY(0); }
+    .principle-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      letter-spacing: -1px;
+      color: var(--mid-gray);
+      line-height: 1;
+      padding-top: 2px;
+    }
+    .principle-q {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+    .principle-a {
+      font-size: 15px;
+      color: var(--gray);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      border: 1px solid var(--black);
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+      background: var(--black);
+    }
+    .cta-text {}
+    .cta-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: -1px;
+      color: var(--white);
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+    .cta-sub {
+      font-size: 15px;
+      color: #aaa;
+      max-width: 440px;
+      line-height: 1.6;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .cta-btn:hover { background: var(--mid-gray); }
+    .cta-arrow { transition: transform 0.2s; }
+    .cta-btn:hover .cta-arrow { transform: translateX(4px); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--mid-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--black);
+    }
+    .footer-copy { font-size: 13px; color: var(--gray); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #page-header .page-label  { animation: fadeUp 0.55s ease both; animation-delay: 0.1s; }
+    #page-header .page-title  { animation: fadeUp 0.55s ease both; animation-delay: 0.2s; }
+    #page-header .page-desc   { animation: fadeUp 0.55s ease both; animation-delay: 0.3s; }
+    #page-header .progress-pill { animation: fadeUp 0.55s ease both; animation-delay: 0.4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      #page-header, #content { padding-left: 24px; padding-right: 24px; }
+      #page-header { padding-top: 110px; }
+      .concept-grid { grid-template-columns: 1fr; }
+      .compound-controls { grid-template-columns: 1fr; }
+      .compound-result { grid-template-columns: 1fr 1fr; }
+      .spectrum-row { grid-template-columns: 1fr; gap: 8px; }
+      .srow-badge { width: fit-content; }
+      .cta-banner { flex-direction: column; padding: 32px 24px; }
+      .cta-btn { width: 100%; justify-content: center; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 32px 24px; }
+      .nav-links a { font-size: 28px; }
+      .asset-table th, .asset-table td { padding: 14px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">EEI</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="finance-intro.html" class="active">Finance 101</a></li>
+      <li><a href="markets.html">Markets</a></li>
+      <li><a href="blog.html">Research</a></li>
+      <li><a href="team.html">Our Team</a></li>
+      <li><a href="index.html#get-involved">Join Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div id="page-header">
+    <p class="page-label">EEI · Finance 101</p>
+    <h1 class="page-title">Before You<br>Invest.</h1>
+    <p class="page-desc">The building blocks every investor needs before looking at a single stock price. Read this, then head to our Markets page.</p>
+    <div class="progress-pill">
+      <span>Your path</span>
+      <div class="pill-steps">
+        <div class="pill-step active" title="Finance 101"></div>
+        <div class="pill-step" title="Markets"></div>
+      </div>
+      <span>Step 1 of 2 Finance 101</span>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- 1. CORE CONCEPTS -->
+    <p class="section-title">The four core ideas</p>
+    <div class="concept-grid" id="core-concepts">
+      <div class="concept-card">
+        
+        <p class="card-term">What is money, really?</p>
+        <p class="card-body">Money is a claim on future goods and services. When you hold cash, you have purchasing power but that power slowly erodes over time due to inflation. The average annual inflation rate in the US is roughly 3%. That means $1,000 today buys about $740 worth of stuff in 10 years if you do nothing with it.</p>
+        <span class="card-tag tag-gray">The baseline problem</span>
+      </div>
+      <div class="concept-card">
+        
+        <p class="card-term">What is investing?</p>
+        <p class="card-body">Investing is putting money to work so it grows faster than inflation. Instead of letting your savings sit idle, you deploy capital into assets like businesses, real estate, or bonds that generate a return. The goal isn't to "get rich quick." It's to build wealth steadily over time by letting your money earn more money.</p>
+        <span class="card-tag tag-green">The solution</span>
+      </div>
+      <div class="concept-card">
+        
+        <p class="card-term">Risk and return</p>
+        <p class="card-body">Every investment involves a trade-off: the higher the potential return, the higher the risk. A savings account is very safe but pays almost nothing. A startup investment could 10× your money or go to zero. Most investing is about finding the right point on this spectrum for your goals and timeline.</p>
+        <span class="card-tag tag-gold">The core trade-off</span>
+      </div>
+      <div class="concept-card">
+        
+        <p class="card-term">Time is your biggest asset</p>
+        <p class="card-body">The single biggest advantage any investor has is time. Starting early even with small amounts matters far more than starting with a lot of money later. This is because of compounding: your returns earn returns. A 22-year-old who invests $200/month will almost always end up wealthier than a 35-year-old investing $500/month, all else equal.</p>
+        <span class="card-tag tag-blue">The unfair advantage</span>
+      </div>
+    </div>
+
+    <!-- 2. COMPOUNDING CALCULATOR -->
+    <p class="section-title">Compounding in action</p>
+    <div class="compound-box">
+      <div class="compound-header">
+        <div>
+          <p class="compound-title">The Compound Interest Calculator</p>
+          <p class="compound-subtitle">Drag the sliders. Watch what time does.</p>
+        </div>
+      </div>
+      <div class="compound-controls">
+        <div class="ctrl-item">
+          <p class="ctrl-label">Initial investment</p>
+          <p class="ctrl-value" id="ctrl-principal">$5,000</p>
+          <input type="range" id="slider-principal" min="500" max="50000" step="500" value="5000" />
+        </div>
+        <div class="ctrl-item">
+          <p class="ctrl-label">Annual return</p>
+          <p class="ctrl-value" id="ctrl-rate">7%</p>
+          <input type="range" id="slider-rate" min="1" max="20" step="0.5" value="7" />
+        </div>
+        <div class="ctrl-item">
+          <p class="ctrl-label">Years invested</p>
+          <p class="ctrl-value" id="ctrl-years">20 yrs</p>
+          <input type="range" id="slider-years" min="1" max="50" step="1" value="20" />
+        </div>
+      </div>
+      <div class="compound-result">
+        <div class="result-item">
+          <p class="result-label">Amount invested</p>
+          <p class="result-value" id="res-invested">$5,000</p>
+        </div>
+        <div class="result-item">
+          <p class="result-label">Growth earned</p>
+          <p class="result-value highlight" id="res-growth">- </p>
+        </div>
+        <div class="result-item">
+          <p class="result-label">Final value</p>
+          <p class="result-value" id="res-final">- </p>
+        </div>
+      </div>
+      <div class="compound-insight" id="compound-insight">- </div>
+    </div>
+
+    <!-- 3. ASSET CLASSES -->
+    <p class="section-title">Asset classes what you can invest in</p>
+    <div class="asset-table-wrap">
+      <table class="asset-table">
+        <thead>
+          <tr>
+            <th>Asset class</th>
+            <th>What it is</th>
+            <th>Typical return</th>
+            <th>Risk level</th>
+            <th>Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="asset-name">Cash &amp; Savings</span>
+              <span class="asset-sub">Banks, money market accounts</span>
+            </td>
+            <td style="font-size:13px;color:var(--gray);line-height:1.5">Money held in a bank or low-risk fund. Earns interest but grows slowly.</td>
+            <td style="font-size:13px;font-weight:500">1–5%</td>
+            <td>
+              <div style="font-size:12px;color:var(--green);margin-bottom:4px">Very Low</div>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:10%;background:#1a6b3a"></div></div>
+            </td>
+            <td style="font-size:13px;color:var(--gray)">Emergency funds, short-term goals</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="asset-name">Bonds</span>
+              <span class="asset-sub">Government &amp; corporate debt</span>
+            </td>
+            <td style="font-size:13px;color:var(--gray);line-height:1.5">You lend money to a government or company, they pay you back with interest over a set period.</td>
+            <td style="font-size:13px;font-weight:500">3–6%</td>
+            <td>
+              <div style="font-size:12px;color:var(--gold);margin-bottom:4px">Low–Medium</div>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:30%;background:#8a6500"></div></div>
+            </td>
+            <td style="font-size:13px;color:var(--gray)">Stable income, portfolio balance</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="asset-name">Stocks (Equities)</span>
+              <span class="asset-sub">Ownership in companies</span>
+            </td>
+            <td style="font-size:13px;color:var(--gray);line-height:1.5">You buy a small piece of a company. If it grows and profits, your share becomes more valuable.</td>
+            <td style="font-size:13px;font-weight:500">7–12%</td>
+            <td>
+              <div style="font-size:12px;color:var(--gold);margin-bottom:4px">Medium–High</div>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:65%;background:#a05000"></div></div>
+            </td>
+            <td style="font-size:13px;color:var(--gray)">Long-term wealth building</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="asset-name">Real Estate</span>
+              <span class="asset-sub">Property, REITs</span>
+            </td>
+            <td style="font-size:13px;color:var(--gray);line-height:1.5">Owning physical property or shares in real estate funds. Can generate rental income and appreciate in value.</td>
+            <td style="font-size:13px;font-weight:500">6–10%</td>
+            <td>
+              <div style="font-size:12px;color:var(--gold);margin-bottom:4px">Medium</div>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:50%;background:#8a6500"></div></div>
+            </td>
+            <td style="font-size:13px;color:var(--gray)">Income + appreciation, diversification</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="asset-name">Index Funds / ETFs</span>
+              <span class="asset-sub">Baskets of many stocks or bonds</span>
+            </td>
+            <td style="font-size:13px;color:var(--gray);line-height:1.5">A single fund that tracks hundreds of companies at once. Instant diversification, low fees. The most recommended starting point for most investors.</td>
+            <td style="font-size:13px;font-weight:500">7–10%</td>
+            <td>
+              <div style="font-size:12px;color:var(--gold);margin-bottom:4px">Medium</div>
+              <div class="risk-bar-bg"><div class="risk-bar" style="width:45%;background:#8a6500"></div></div>
+            </td>
+            <td style="font-size:13px;color:var(--gray)">Most investors simple, proven</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. RISK SPECTRUM -->
+    <p class="section-title">The risk spectrum</p>
+    <div class="spectrum-box">
+      <div class="spectrum-header">
+        <p class="spectrum-title">More risk → more potential reward</p>
+        <p class="spectrum-sub">But risk also means you can lose money. There's no free lunch.</p>
+      </div>
+      <div class="spectrum-track"></div>
+      <div class="spectrum-labels">
+        <span>Lower risk / lower return</span>
+        <span>Higher risk / higher return</span>
+      </div>
+      <div class="spectrum-items" id="spectrum-items">
+        <div class="spectrum-row">
+          <p class="srow-name">FDIC Savings Account</p>
+          <p class="srow-desc">Government-insured. You will not lose money. Returns are low often below inflation after tax.</p>
+          <span class="srow-badge tag-green">Very Low Risk</span>
+        </div>
+        <div class="spectrum-row">
+          <p class="srow-name">US Treasury Bonds</p>
+          <p class="srow-desc">Backed by the US government. Considered the closest thing to a "risk-free" investment in markets.</p>
+          <span class="srow-badge tag-green">Low Risk</span>
+        </div>
+        <div class="spectrum-row">
+          <p class="srow-name">S&amp;P 500 Index Fund</p>
+          <p class="srow-desc">Tracks the 500 largest US companies. Has never failed to recover from a crash over a 15+ year period historically.</p>
+          <span class="srow-badge tag-gold">Medium Risk</span>
+        </div>
+        <div class="spectrum-row">
+          <p class="srow-name">Individual Stocks</p>
+          <p class="srow-desc">Single companies can collapse. Picking stocks requires research and accepting that you could lose everything in one position.</p>
+          <span class="srow-badge tag-gold">Medium–High Risk</span>
+        </div>
+        <div class="spectrum-row">
+          <p class="srow-name">Emerging Market Stocks</p>
+          <p class="srow-desc">Companies in developing economies higher growth potential but more political and economic volatility.</p>
+          <span class="srow-badge" style="background:var(--red-bg);color:var(--red)">High Risk</span>
+        </div>
+        <div class="spectrum-row">
+          <p class="srow-name">Cryptocurrency / Speculative Assets</p>
+          <p class="srow-desc">Prices can swing 50%+ in either direction within months. Only invest what you're prepared to lose entirely.</p>
+          <span class="srow-badge" style="background:var(--red-bg);color:var(--red)">Very High Risk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. INVESTOR PRINCIPLES -->
+    <p class="section-title">Six principles every investor should internalize</p>
+    <div class="principles-list" id="principles-list">
+      <div class="principle-row">
+        <span class="principle-num">01</span>
+        <div>
+          <p class="principle-q">Never invest money you can't afford to lose</p>
+          <p class="principle-a">Before investing anything, make sure you have 3–6 months of living expenses in a liquid savings account. Investing should happen with money you don't need in the near term. Selling investments early especially during a downturn is one of the most common ways new investors lose money.</p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <span class="principle-num">02</span>
+        <div>
+          <p class="principle-q">Diversification reduces risk without necessarily reducing returns</p>
+          <p class="principle-a">Spreading your investments across different assets, sectors, and geographies means one bad bet doesn't sink you. If you own 500 stocks through an index fund and one company goes bankrupt, you barely feel it. Concentration is how fortunes are made and how they're lost.</p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <span class="principle-num">03</span>
+        <div>
+          <p class="principle-q">The market will always crash and always recover</p>
+          <p class="principle-a">Since 1928, the S&P 500 has experienced crashes of 20%+ more than a dozen times. It has recovered from every single one. Long-term investors who stayed the course during the 2008 financial crisis, the 2020 COVID crash, or the dot-com bust came out ahead. Panic selling locks in losses.</p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <span class="principle-num">04</span>
+        <div>
+          <p class="principle-q">Fees compound just like returns do in reverse</p>
+          <p class="principle-a">A fund charging 1% annually sounds trivial. Over 30 years, it can cost you 25%+ of your final portfolio compared to a 0.03% index fund. Always check the expense ratio of any fund you invest in. Low-cost index funds exist specifically because of this math.</p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <span class="principle-num">05</span>
+        <div>
+          <p class="principle-q">Timing the market is almost impossible time in the market is proven</p>
+          <p class="principle-a">Professional fund managers with teams of analysts fail to beat the market consistently. Trying to predict the "best time to buy" leads most people to buy high and sell low. The evidence overwhelmingly supports a simple strategy: invest regularly, stay invested, rebalance occasionally.</p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <span class="principle-num">06</span>
+        <div>
+          <p class="principle-q">Understand what you own</p>
+          <p class="principle-a">Before buying any investment, be able to answer: what is this, how does it make money, and under what conditions would I lose money? If you can't answer those questions, don't invest yet. Our Markets page walks you through how to read stocks and understand the numbers you'll see that's your next step.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA TO MARKETS -->
+    <div class="cta-banner">
+      <div class="cta-text">
+        <p class="cta-headline">Ready for<br>the real data?</p>
+        <p class="cta-sub">You've covered the fundamentals. Now head to our Markets page to see live stocks, price charts, and learn what the numbers actually mean.</p>
+      </div>
+      <a href="markets.html" class="cta-btn">
+        Go to Markets
+        <span class="cta-arrow">→</span>
+      </a>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer>
+    <span class="footer-logo">EEI</span>
+    <span class="footer-copy">Educational content only · Not financial advice</span>
+  </footer>
+
+  <script>
+    /* ── NAV TOGGLE ── */
+    const toggle = document.getElementById('nav-toggle');
+    const links  = document.getElementById('nav-links');
+    toggle.addEventListener('click', () => {
+      const open = links.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open);
+    });
+    links.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        links.classList.remove('open');
+        toggle.classList.remove('open');
+        toggle.setAttribute('aria-expanded', false);
+      });
+    });
+
+    /* ── COMPOUNDING CALCULATOR ── */
+    const sliderP = document.getElementById('slider-principal');
+    const sliderR = document.getElementById('slider-rate');
+    const sliderY = document.getElementById('slider-years');
+
+    function fmt(n) {
+      return '$' + Math.round(n).toLocaleString('en-US');
+    }
+
+    function calcCompound() {
+      const P = parseFloat(sliderP.value);
+      const r = parseFloat(sliderR.value) / 100;
+      const t = parseInt(sliderY.value);
+      const final = P * Math.pow(1 + r, t);
+      const growth = final - P;
+      const multiplier = (final / P).toFixed(1);
+
+      document.getElementById('ctrl-principal').textContent = fmt(P);
+      document.getElementById('ctrl-rate').textContent = sliderR.value + '%';
+      document.getElementById('ctrl-years').textContent = t + ' yrs';
+      document.getElementById('res-invested').textContent = fmt(P);
+      document.getElementById('res-growth').textContent = fmt(growth);
+      document.getElementById('res-final').textContent = fmt(final);
+
+      const insight = document.getElementById('compound-insight');
+      insight.innerHTML = `At <strong>${sliderR.value}% annual return</strong>, your <strong>${fmt(P)}</strong> becomes <strong>${fmt(final)}</strong> after ${t} years, a <strong>${multiplier}× increase</strong>. Of that final amount, <strong>${fmt(growth)}</strong> is pure growth you never contributed. That's the power of compounding: your gains earn their own gains.`;
+    }
+
+    sliderP.addEventListener('input', calcCompound);
+    sliderR.addEventListener('input', calcCompound);
+    sliderY.addEventListener('input', calcCompound);
+    calcCompound();
+
+    /* ── SCROLL ANIMATIONS ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          // stagger children if container
+          const rows = e.target.querySelectorAll
+            ? e.target.querySelectorAll('.concept-card, .principle-row, .spectrum-row')
+            : [];
+          if (rows.length) {
+            rows.forEach((r, i) => {
+              setTimeout(() => r.classList.add('visible'), i * 80);
+            });
+          } else {
+            e.target.classList.add('visible');
+          }
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('#core-concepts, #principles-list, #spectrum-items').forEach(el => observer.observe(el));
+    // also observe individual rows for spectrum
+    document.querySelectorAll('.spectrum-row, .principle-row, .concept-card').forEach(el => {
+      // let parent handle them
+    });
+  </script>
+
+</body>
+</html>
